@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance Dashboard — FB Ads & Scalev</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple: #7C3AED;
+  --purple-light: #A78BFA;
+  --purple-dark: #4C1D95;
+  --purple-mid: #6D28D9;
+  --pink: #EC4899;
+  --pink-light: #F9A8D4;
+  --cyan: #06B6D4;
+  --green: #10B981;
+  --red: #F43F5E;
+  --amber: #F59E0B;
+  --bg: #0F0720;
+  --bg2: #1A0D35;
+  --bg3: #251246;
+  --card: rgba(255,255,255,0.06);
+  --card-border: rgba(255,255,255,0.10);
+  --text: #F3F0FF;
+  --text-muted: rgba(243,240,255,0.55);
+  --text-dim: rgba(243,240,255,0.30);
+  --font: 'Sora', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --radius: 20px;
+  --radius-sm: 12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.25) 0%,transparent 70%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;bottom:-200px;right:-200px;width:500px;height:500px;background:radial-gradient(circle,rgba(236,72,153,0.18) 0%,transparent 70%);pointer-events:none;z-index:0}
+
+/* APP SHELL */
+.app{max-width:420px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding-bottom:80px}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0}
+.topbar-greet{font-size:12px;color:var(--text-muted);font-weight:400}
+.topbar-name{font-size:16px;font-weight:700;color:var(--text)}
+.avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;border:2px solid rgba(255,255,255,0.2)}
+
+/* BALANCE CARD */
+.balance-card{margin:20px 16px 0;background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 50%,var(--purple-mid) 100%);border-radius:var(--radius);padding:24px;position:relative;overflow:hidden}
+.balance-card::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.08)}
+.balance-card::after{content:'';position:absolute;bottom:-40px;left:60px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05)}
+.balance-label{font-size:12px;color:rgba(255,255,255,0.7);font-weight:500;letter-spacing:0.5px;margin-bottom:6px}
+.balance-amount{font-size:36px;font-weight:800;color:#fff;font-family:var(--mono);letter-spacing:-1px;position:relative;z-index:1}
+.balance-currency{font-size:16px;font-weight:500;opacity:0.8;vertical-align:super;font-family:var(--font)}
+.balance-row{display:flex;gap:12px;margin-top:20px;position:relative;z-index:1}
+.balance-item{flex:1;background:rgba(255,255,255,0.12);border-radius:var(--radius-sm);padding:10px 12px;backdrop-filter:blur(10px)}
+.balance-item-label{font-size:10px;color:rgba(255,255,255,0.65);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.balance-item-val{font-size:14px;font-weight:700;color:#fff;font-family:var(--mono)}
+.arrow-up{color:#6EE7B7}
+.arrow-down{color:#FCA5A5}
+.tax-note{font-size:9px;color:rgba(255,255,255,0.5);margin-top:2px}
+
+/* SECTION */
+.section{padding:20px 16px 0}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:14px;font-weight:700;color:var(--text)}
+.see-all{font-size:12px;color:var(--purple-light);font-weight:500;cursor:pointer;border:none;background:none;color:var(--purple-light)}
+
+/* METRIC PILLS */
+.metric-pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.metric-pills::-webkit-scrollbar{display:none}
+.pill{flex-shrink:0;background:var(--card);border:1px solid var(--card-border);border-radius:50px;padding:8px 16px;display:flex;align-items:center;gap:8px;backdrop-filter:blur(12px)}
+.pill-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pill-label{font-size:11px;color:var(--text-muted)}
+.pill-val{font-size:13px;font-weight:700;font-family:var(--mono)}
+
+/* TABS */
+.tabs{display:flex;background:var(--card);border:1px solid var(--card-border);border-radius:50px;padding:4px;margin:20px 16px 0}
+.tab-btn{flex:1;padding:8px 4px;border:none;background:none;font-family:var(--font);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;border-radius:50px;transition:all 0.2s}
+.tab-btn.active{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff}
+
+/* CHART AREA */
+.chart-wrap{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:16px;margin:12px 16px 0;backdrop-filter:blur(12px)}
+.chart-week{font-size:11px;color:var(--text-muted);margin-bottom:12px}
+.chart-week b{color:var(--text)}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:100px}
+.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-pair{display:flex;gap:3px;align-items:flex-end;height:88px}
+.bar{border-radius:6px 6px 2px 2px;min-width:10px;transition:height 0.4s ease;cursor:pointer;position:relative}
+.bar.income{background:linear-gradient(180deg,var(--purple-light),var(--purple))}
+.bar.expense{background:linear-gradient(180deg,var(--pink-light),var(--pink))}
+.bar.today-marker::after{content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:6px;height:6px;background:#fff;border-radius:50%}
+.bar-day{font-size:10px;color:var(--text-dim);font-weight:500}
+.chart-legend{display:flex;gap:16px;margin-top:12px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+
+/* RECENT TRANSACTIONS */
+.txn-list{display:flex;flex-direction:column;gap:10px}
+.txn-item{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:12px 14px;backdrop-filter:blur(12px);transition:transform 0.15s}
+.txn-item:active{transform:scale(0.98)}
+.txn-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.txn-info{flex:1}
+.txn-name{font-size:13px;font-weight:600;color:var(--text)}
+.txn-cat{font-size:11px;color:var(--text-muted)}
+.txn-right{text-align:right}
+.txn-amount{font-size:14px;font-weight:700;font-family:var(--mono)}
+.txn-amount.pos{color:var(--green)}
+.txn-amount.neg{color:var(--red)}
+.txn-date{font-size:10px;color:var(--text-dim);margin-top:2px}
+
+/* TARGET CARD */
+.target-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:18px;margin:12px 16px 0;backdrop-filter:blur(12px)}
+.target-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.target-label{font-size:13px;font-weight:600}
+.target-pct{font-size:22px;font-weight:800;font-family:var(--mono);color:var(--purple-light)}
+.progress-track{background:rgba(255,255,255,0.08);border-radius:50px;height:8px;overflow:hidden}
+.progress-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width 0.6s ease}
+.target-vals{display:flex;justify-content:space-between;margin-top:8px}
+.target-val-label{font-size:11px;color:var(--text-muted)}
+.target-val{font-size:12px;font-weight:700;font-family:var(--mono)}
+
+/* FB ADS CARD */
+.fb-card{background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(37,99,235,0.08));border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius);padding:18px;margin:12px 16px 0}
+.fb-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.fb-icon{width:36px;height:36px;border-radius:10px;background:rgba(59,130,246,0.3);display:flex;align-items:center;justify-content:center;font-size:18px}
+.fb-title{font-size:14px;font-weight:700}
+.fb-sub{font-size:11px;color:var(--text-muted)}
+.fb-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fb-metric{background:rgba(255,255,255,0.05);border-radius:var(--radius-sm);padding:10px 12px}
+.fb-metric-label{font-size:10px;color:var(--text-muted);margin-bottom:4px}
+.fb-metric-val{font-size:16px;font-weight:700;font-family:var(--mono)}
+.tax-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.3);border-radius:50px;padding:3px 8px;font-size:10px;color:var(--amber);font-weight:600;margin-top:6px}
+
+/* SCALEV CARD */
+.sv-card{background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(5,150,105,0.08));border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius);padding:18px;margin:12px 16px 0}
+
+/* INPUT CARD */
+.input-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:18px;margin:12px 16px 0;backdrop-filter:blur(12px)}
+.input-card h3{font-size:14px;font-weight:700;margin-bottom:14px}
+.input-group{margin-bottom:12px}
+.input-label{font-size:11px;color:var(--text-muted);margin-bottom:6px;font-weight:500}
+.input-field{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);padding:10px 14px;font-family:var(--font);font-size:13px;color:var(--text);outline:none;transition:border-color 0.2s}
+.input-field:focus{border-color:var(--purple-light)}
+.input-field::placeholder{color:var(--text-dim)}
+.btn-primary{width:100%;padding:12px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--purple),var(--pink));font-family:var(--font);font-size:14px;font-weight:700;color:#fff;cursor:pointer;transition:opacity 0.2s,transform 0.1s;margin-top:4px}
+.btn-primary:active{transform:scale(0.98);opacity:0.9}
+.btn-row{display:flex;gap:8px;margin-top:8px}
+.btn-secondary{flex:1;padding:10px;border:1px solid var(--card-border);border-radius:50px;background:transparent;font-family:var(--font);font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer}
+.btn-clear{flex:1;padding:10px;border:1px solid rgba(244,63,94,0.3);border-radius:50px;background:transparent;font-family:var(--font);font-size:13px;font-weight:600;color:var(--red);cursor:pointer}
+
+/* API SETTINGS */
+.api-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:18px;margin:12px 16px 0}
+.api-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.api-row:last-child{border-bottom:none}
+.api-info{}
+.api-name{font-size:13px;font-weight:600}
+.api-status{font-size:11px;margin-top:2px}
+.api-status.connected{color:var(--green)}
+.api-status.disconnected{color:var(--amber)}
+.api-btn{padding:6px 14px;border-radius:50px;border:none;font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer}
+.api-btn.connect{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff}
+.api-btn.active{background:rgba(16,185,129,0.2);color:var(--green);border:1px solid rgba(16,185,129,0.3)}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:rgba(15,7,32,0.9);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;padding:8px 20px 20px;z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px;border-radius:var(--radius-sm);transition:all 0.2s;border:none;background:none}
+.nav-icon{font-size:20px;transition:transform 0.2s}
+.nav-label{font-size:10px;color:var(--text-dim);font-weight:500}
+.nav-item.active .nav-label{color:var(--purple-light)}
+.nav-item.active .nav-icon{transform:scale(1.15)}
+
+/* FAB */
+.fab{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;box-shadow:0 8px 24px rgba(124,58,237,0.5);transition:transform 0.2s,box-shadow 0.2s;flex-shrink:0}
+.fab:active{transform:scale(0.93);box-shadow:0 4px 12px rgba(124,58,237,0.4)}
+
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.donut{position:relative;width:90px;height:90px;flex-shrink:0}
+.donut svg{transform:rotate(-90deg)}
+.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.donut-pct{font-size:17px;font-weight:800;font-family:var(--mono);color:var(--text)}
+.donut-sub{font-size:9px;color:var(--text-muted)}
+.donut-legend{flex:1}
+.donut-legend-item{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.donut-legend-left{display:flex;align-items:center;gap:8px}
+.donut-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.donut-legend-label{font-size:12px;color:var(--text-muted)}
+.donut-legend-pct{font-size:12px;font-weight:700;font-family:var(--mono)}
+
+/* PAGE SECTIONS */
+.page{display:none}.page.active{display:block}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:420px;padding:24px 20px 40px;animation:slideUp 0.3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:50px;margin:0 auto 20px}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:20px}
+.modal-tabs{display:flex;gap:8px;margin-bottom:16px}
+.modal-tab{flex:1;padding:8px;border-radius:50px;border:1px solid var(--card-border);background:none;font-family:var(--font);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer}
+.modal-tab.active{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;border-color:transparent}
+
+/* TOAST */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--green);color:#fff;padding:10px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:300;transition:transform 0.3s ease;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ANIMATIONS */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeInUp 0.4s ease both}
+.anim-1{animation-delay:0.05s}
+.anim-2{animation-delay:0.1s}
+.anim-3{animation-delay:0.15s}
+.anim-4{animation-delay:0.2s}
+
+.empty-state{text-align:center;padding:30px 20px;color:var(--text-dim);font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:50px;font-size:10px;font-weight:700}
+.chip-green{background:rgba(16,185,129,0.15);color:var(--green)}
+.chip-red{background:rgba(244,63,94,0.15);color:var(--red)}
+.chip-amber{background:rgba(245,158,11,0.15);color:var(--amber)}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+  <div class="topbar anim">
+    <div>
+      <div class="topbar-greet">Selamat datang,</div>
+      <div class="topbar-name" id="display-name">Pebisnis Hebat 👋</div>
+    </div>
+    <div class="avatar">💼</div>
+  </div>
+
+  <!-- BALANCE CARD -->
+  <div class="balance-card anim anim-1">
+    <div class="balance-label">Profit Bulan Ini</div>
+    <div class="balance-amount"><span class="balance-currency">Rp </span><span id="home-profit">0</span></div>
+    <div class="balance-row">
+      <div class="balance-item">
+        <div class="balance-item-label"><span class="arrow-up">▲</span> Revenue</div>
+        <div class="balance-item-val" id="home-rev">0</div>
+      </div>
+      <div class="balance-item">
+        <div class="balance-item-label"><span class="arrow-down">▼</span> Iklan + Pajak</div>
+        <div class="balance-item-val" id="home-spend">0</div>
+        <div class="tax-note">termasuk PPN 12%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- METRIC PILLS -->
+  <div class="section anim anim-2">
+    <div class="metric-pills">
+      <div class="pill">
+        <div class="pill-dot" style="background:var(--purple-light)"></div>
+        <div>
+          <div class="pill-label">ROAS</div>
+          <div class="pill-val" id="pill-roas">—</div>
+        </div>
+      </div>
+      <div class="pill">
+        <div class="pill-dot" style="background:var(--pink)"></div>
+        <div>
+          <div class="pill-label">CPA</div>
+          <div class="pill-val" id="pill-cpa">—</div>
+        </div>
+      </div>
+      <div class="pill">
+        <div class="pill-dot" style="background:var(--green)"></div>
+        <div>
+          <div class="pill-label">Total Order</div>
+          <div class="pill-val" id="pill-orders">0</div>
+        </div>
+      </div>
+      <div class="pill">
+        <div class="pill-dot" style="background:var(--amber)"></div>
+        <div>
+          <div class="pill-label">Pajak FB Ads</div>
+          <div class="pill-val" id="pill-tax">Rp 0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TARGET PROGRESS -->
+  <div class="section anim anim-2">
+    <div class="section-header"><span class="section-title">🎯 Target Profit Bulanan</span><button class="see-all" onclick="openTargetModal()">Ubah</button></div>
+    <div class="target-card">
+      <div class="target-row">
+        <div>
+          <div style="font-size:12px;color:var(--text-muted)">Progress</div>
+          <div style="font-size:11px;color:var(--text-dim)" id="target-sub-text">Rp 0 dari Rp 0</div>
+        </div>
+        <div class="target-pct" id="target-pct-display">0%</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="target-vals">
+        <div><div class="target-val-label">Sisa target</div><div class="target-val" id="target-remaining" style="color:var(--red)">Rp 0</div></div>
+        <div style="text-align:center"><div class="target-val-label">Perlu/hari</div><div class="target-val" id="target-per-day" style="color:var(--amber)">Rp 0</div></div>
+        <div style="text-align:right"><div class="target-val-label">Proyeksi</div><div class="target-val" id="target-projected" style="color:var(--green)">Rp 0</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="section anim anim-3">
+    <div class="section-header"><span class="section-title">📊 7 Hari Terakhir</span></div>
+    <div class="chart-wrap">
+      <div class="chart-week">Minggu ini — <b id="chart-week-label">—</b></div>
+      <div class="bar-chart" id="bar-chart"></div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--purple-light)"></div>Revenue</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>Pengeluaran Iklan</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT -->
+  <div class="section anim anim-4">
+    <div class="section-header"><span class="section-title">🔄 Transaksi Terbaru</span></div>
+    <div class="txn-list" id="home-txn-list">
+      <div class="empty-state">Belum ada transaksi. Tambahkan lewat tombol + di bawah.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS PAGE -->
+<div id="page-analytics" class="page">
+  <div class="topbar"><div class="topbar-name">📈 Analytics</div></div>
+
+  <div class="section">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchAnalyticsTab('fb',this)">Facebook Ads</button>
+      <button class="tab-btn" onclick="switchAnalyticsTab('scalev',this)">Scalev</button>
+    </div>
+  </div>
+
+  <!-- FB ADS TAB -->
+  <div id="analytics-fb">
+    <div class="fb-card anim">
+      <div class="fb-header">
+        <div class="fb-icon">📘</div>
+        <div><div class="fb-title">Facebook Ads</div><div class="fb-sub">Pengeluaran + Pajak PPN 12%</div></div>
+      </div>
+      <div class="fb-metrics">
+        <div class="fb-metric">
+          <div class="fb-metric-label">Total Spent</div>
+          <div class="fb-metric-val" id="ana-fb-spend" style="color:var(--red)">Rp 0</div>
+          <div class="tax-badge">🧾 +12% PPN</div>
+        </div>
+        <div class="fb-metric">
+          <div class="fb-metric-label">Total + Pajak</div>
+          <div class="fb-metric-val" id="ana-fb-total" style="color:var(--amber)">Rp 0</div>
+        </div>
+        <div class="fb-metric">
+          <div class="fb-metric-label">Pajak (12%)</div>
+          <div class="fb-metric-val" id="ana-fb-tax" style="color:var(--amber)">Rp 0</div>
+        </div>
+        <div class="fb-metric">
+          <div class="fb-metric-label">ROAS</div>
+          <div class="fb-metric-val" id="ana-roas" style="color:var(--purple-light)">—</div>
+        </div>
+        <div class="fb-metric">
+          <div class="fb-metric-label">CTR Rata-rata</div>
+          <div class="fb-metric-val" id="ana-ctr" style="color:var(--cyan)">—</div>
+        </div>
+        <div class="fb-metric">
+          <div class="fb-metric-label">CPA</div>
+          <div class="fb-metric-val" id="ana-cpa" style="color:var(--pink)">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DONUT -->
+    <div class="section">
+      <div class="chart-wrap">
+        <div class="section-header" style="margin-bottom:12px"><span style="font-size:13px;font-weight:700">Breakdown Pengeluaran</span></div>
+        <div class="donut-wrap">
+          <div class="donut">
+            <svg width="90" height="90" viewBox="0 0 90 90">
+              <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+              <circle id="donut-spend" cx="45" cy="45" r="36" fill="none" stroke="#7C3AED" stroke-width="12" stroke-dasharray="226.2" stroke-dashoffset="56.55" stroke-linecap="round"/>
+              <circle id="donut-tax" cx="45" cy="45" r="36" fill="none" stroke="#F59E0B" stroke-width="12" stroke-dasharray="226.2" stroke-dashoffset="198.8" stroke-linecap="round" style="transform-origin:center;transform:rotate(251.1deg)"/>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-pct" id="donut-pct">0%</div>
+              <div class="donut-sub">pajak</div>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="donut-legend-item">
+              <div class="donut-legend-left"><div class="donut-legend-dot" style="background:var(--purple)"></div><span class="donut-legend-label">Biaya iklan</span></div>
+              <span class="donut-legend-pct" id="dl-spend">Rp 0</span>
+            </div>
+            <div class="donut-legend-item">
+              <div class="donut-legend-left"><div class="donut-legend-dot" style="background:var(--amber)"></div><span class="donut-legend-label">PPN 12%</span></div>
+              <span class="donut-legend-pct" id="dl-tax" style="color:var(--amber)">Rp 0</span>
+            </div>
+            <div class="donut-legend-item" style="border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;margin-top:4px">
+              <div class="donut-legend-left"><div class="donut-legend-dot" style="background:var(--red)"></div><span class="donut-legend-label">Total</span></div>
+              <span class="donut-legend-pct" id="dl-total" style="color:var(--red)">Rp 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header"><span class="section-title">Riwayat Iklan</span></div>
+      <div class="txn-list" id="fb-txn-list"><div class="empty-state">Belum ada data iklan</div></div>
+    </div>
+  </div>
+
+  <!-- SCALEV TAB -->
+  <div id="analytics-scalev" style="display:none">
+    <div class="sv-card anim">
+      <div class="fb-header">
+        <div class="fb-icon" style="background:rgba(16,185,129,0.3)">🛒</div>
+        <div><div class="fb-title">Scalev</div><div class="fb-sub">Data penjualan bulan ini</div></div>
+      </div>
+      <div class="fb-metrics">
+        <div class="fb-metric">
+          <div class="fb-metric-label">Total Revenue</div>
+          <div class="fb-metric-val" id="ana-sv-rev" style="color:var(--green)">Rp 0</div>
+        </div>
+        <div class="fb-metric">
+          <div class="fb-metric-label">Total Order</div>
+          <div class="fb-metric-val" id="ana-sv-orders" style="color:var(--cyan)">0</div>
+        </div>
+        <div class="fb-metric">
+          <div class="fb-metric-label">Total HPP</div>
+          <div class="fb-metric-val" id="ana-sv-cogs" style="color:var(--text-muted)">Rp 0</div>
+        </div>
+        <div class="fb-metric">
+          <div class="fb-metric-label">AOV</div>
+          <div class="fb-metric-val" id="ana-sv-aov" style="color:var(--purple-light)">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header"><span class="section-title">Riwayat Penjualan</span></div>
+      <div class="txn-list" id="sv-txn-list"><div class="empty-state">Belum ada data penjualan</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TARGET PAGE -->
+<div id="page-target" class="page">
+  <div class="topbar"><div class="topbar-name">🎯 Target Profit</div></div>
+
+  <div class="section" style="margin-top:8px">
+    <div class="input-card">
+      <h3>Setting Target Bulanan</h3>
+      <div class="input-group">
+        <div class="input-label">Target Profit (Rp)</div>
+        <input class="input-field" type="number" id="target-input" placeholder="75000000" value="75000000">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Bulan</div>
+        <input class="input-field" type="month" id="target-month-input">
+      </div>
+      <button class="btn-primary" onclick="saveTarget()">💾 Simpan Target</button>
+    </div>
+
+    <div class="target-card" style="margin-top:12px">
+      <div class="target-row" style="margin-bottom:16px">
+        <div><div style="font-size:14px;font-weight:700">Progress Bulan Ini</div></div>
+        <div class="target-pct" id="target-page-pct">0%</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill-2" style="width:0%"></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+        <div class="fb-metric"><div class="fb-metric-label">Profit Saat Ini</div><div class="fb-metric-val" id="tp-profit" style="color:var(--green)">Rp 0</div></div>
+        <div class="fb-metric"><div class="fb-metric-label">Target</div><div class="fb-metric-val" id="tp-target" style="color:var(--purple-light)">Rp 0</div></div>
+        <div class="fb-metric"><div class="fb-metric-label">Sisa</div><div class="fb-metric-val" id="tp-remaining" style="color:var(--red)">Rp 0</div></div>
+        <div class="fb-metric"><div class="fb-metric-label">Perlu/Hari</div><div class="fb-metric-val" id="tp-per-day" style="color:var(--amber)">Rp 0</div></div>
+        <div class="fb-metric"><div class="fb-metric-label">Rata-rata/Hari</div><div class="fb-metric-val" id="tp-avg" style="color:var(--cyan)">Rp 0</div></div>
+        <div class="fb-metric"><div class="fb-metric-label">Proyeksi</div><div class="fb-metric-val" id="tp-projected" style="color:var(--green)">Rp 0</div></div>
+        <div class="fb-metric" style="grid-column:span 2"><div class="fb-metric-label">Status</div><div id="tp-status" style="margin-top:4px"><span class="chip chip-amber">—</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div id="page-settings" class="page">
+  <div class="topbar"><div class="topbar-name">⚙️ Pengaturan</div></div>
+
+  <div class="section" style="margin-top:8px">
+    <div class="input-card">
+      <h3>👤 Profil</h3>
+      <div class="input-group">
+        <div class="input-label">Nama</div>
+        <input class="input-field" type="text" id="settings-name" placeholder="Nama Anda">
+      </div>
+      <button class="btn-primary" onclick="saveName()">Simpan</button>
+    </div>
+
+    <div class="api-card" style="margin-top:12px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px">🔌 Koneksi API</div>
+      <div class="api-row">
+        <div class="api-info">
+          <div class="api-name">📘 Facebook Ads</div>
+          <div class="api-status disconnected" id="fb-api-status-text">Belum terhubung</div>
+        </div>
+        <button class="api-btn connect" onclick="openFbModal()">Hubungkan</button>
+      </div>
+      <div class="api-row">
+        <div class="api-info">
+          <div class="api-name">🛒 Scalev</div>
+          <div class="api-status disconnected" id="sv-api-status-text">Belum terhubung</div>
+        </div>
+        <button class="api-btn connect" onclick="openSvModal()">Hubungkan</button>
+      </div>
+    </div>
+
+    <div class="api-card" style="margin-top:12px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px">🧾 Info Pajak Meta Ads</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Meta (Facebook) mengenakan <b style="color:var(--amber)">PPN 12%</b> atas biaya iklan di Indonesia. Pajak ini otomatis ditambahkan ke setiap pengeluaran iklan yang Anda catat di sini.<br><br>Formula: <span style="font-family:var(--mono);color:var(--purple-light)">Total = Spent × 1.12</span></div>
+    </div>
+
+    <div class="api-card" style="margin-top:12px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">🗑️ Reset Data</div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Hapus semua data transaksi. Tidak bisa dibatalkan.</p>
+      <button onclick="resetData()" style="width:100%;padding:10px;border-radius:50px;border:1px solid rgba(244,63,94,0.4);background:rgba(244,63,94,0.1);font-family:var(--font);font-size:13px;font-weight:700;color:var(--red);cursor:pointer">Hapus Semua Data</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="navTo('home',this)" id="nav-home">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Home</span>
+  </button>
+  <button class="nav-item" onclick="navTo('analytics',this)" id="nav-analytics">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">Analytics</span>
+  </button>
+  <button class="fab" onclick="openAddModal()">＋</button>
+  <button class="nav-item" onclick="navTo('target',this)" id="nav-target">
+    <span class="nav-icon">🎯</span>
+    <span class="nav-label">Target</span>
+  </button>
+  <button class="nav-item" onclick="navTo('settings',this)" id="nav-settings">
+    <span class="nav-icon">⚙️</span>
+    <span class="nav-label">Setting</span>
+  </button>
+</nav>
+
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="modal-add">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Tambah Data</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchModalTab('fb',this)">📘 Facebook Ads</button>
+      <button class="modal-tab" onclick="switchModalTab('scalev',this)">🛒 Scalev</button>
+    </div>
+
+    <!-- FB FORM -->
+    <div id="modal-fb">
+      <div class="input-group">
+        <div class="input-label">Tanggal</div>
+        <input class="input-field" type="date" id="m-fb-date">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Nama Kampanye</div>
+        <input class="input-field" type="text" id="m-fb-campaign" placeholder="Campaign Produk A">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Pengeluaran Iklan (Rp) — sebelum pajak</div>
+        <input class="input-field" type="number" id="m-fb-spend" placeholder="500000" oninput="previewTax()">
+      </div>
+      <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:var(--amber)">🧾 PPN 12% = <span id="tax-preview">Rp 0</span></span>
+        <span style="font-size:12px;font-weight:700;color:var(--text)">Total: <span id="total-preview">Rp 0</span></span>
+      </div>
+      <div class="input-group">
+        <div class="input-label">Impresi</div>
+        <input class="input-field" type="number" id="m-fb-impressions" placeholder="10000">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Klik</div>
+        <input class="input-field" type="number" id="m-fb-clicks" placeholder="300">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Pembelian</div>
+        <input class="input-field" type="number" id="m-fb-purchases" placeholder="15">
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="closeModal('modal-add')">Batal</button>
+        <button class="btn-primary" style="flex:2" onclick="saveFbData()">💾 Simpan</button>
+      </div>
+    </div>
+
+    <!-- SCALEV FORM -->
+    <div id="modal-scalev" style="display:none">
+      <div class="input-group">
+        <div class="input-label">Tanggal</div>
+        <input class="input-field" type="date" id="m-sv-date">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Produk</div>
+        <input class="input-field" type="text" id="m-sv-product" placeholder="Nama Produk">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Revenue (Rp)</div>
+        <input class="input-field" type="number" id="m-sv-revenue" placeholder="2000000">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Jumlah Order</div>
+        <input class="input-field" type="number" id="m-sv-orders" placeholder="20">
+      </div>
+      <div class="input-group">
+        <div class="input-label">HPP / Modal (Rp)</div>
+        <input class="input-field" type="number" id="m-sv-cogs" placeholder="800000">
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="closeModal('modal-add')">Batal</button>
+        <button class="btn-primary" style="flex:2" onclick="saveSvData()">💾 Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FB API MODAL -->
+<div class="modal-overlay" id="modal-fb-api">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📘 Hubungkan Facebook Ads</div>
+    <div class="input-group">
+      <div class="input-label">Access Token</div>
+      <input class="input-field" type="password" id="s-fb-token" placeholder="EAA...">
+    </div>
+    <div class="input-group">
+      <div class="input-label">Ad Account ID</div>
+      <input class="input-field" type="text" id="s-fb-account" placeholder="act_XXXXXXXXXX">
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('modal-fb-api')">Batal</button>
+      <button class="btn-primary" style="flex:2" onclick="connectFbApi()">🔌 Hubungkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCALEV API MODAL -->
+<div class="modal-overlay" id="modal-sv-api">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🛒 Hubungkan Scalev</div>
+    <div class="input-group">
+      <div class="input-label">API Key</div>
+      <input class="input-field" type="password" id="s-sv-key" placeholder="Scalev API Key">
+    </div>
+    <div class="input-group">
+      <div class="input-label">Store ID</div>
+      <input class="input-field" type="text" id="s-sv-store" placeholder="Store ID Anda">
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('modal-sv-api')">Batal</button>
+      <button class="btn-primary" style="flex:2" onclick="connectSvApi()">🔌 Hubungkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- TARGET MODAL -->
+<div class="modal-overlay" id="modal-target">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🎯 Set Target Profit</div>
+    <div class="input-group">
+      <div class="input-label">Target Profit (Rp)</div>
+      <input class="input-field" type="number" id="modal-target-input" placeholder="75000000">
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('modal-target')">Batal</button>
+      <button class="btn-primary" style="flex:2" onclick="saveTargetModal()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ Data tersimpan!</div>
+
+<script>
+const TAX = 0.12;
+const state = {
+  fbData: [],
+  svData: [],
+  target: 75000000,
+  fbConnected: false,
+  svConnected: false,
+  name: 'Pebisnis Hebat 👋'
+};
+
+// UTILS
+const fmt = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+const fmtShort = n => {
+  if (n >= 1e9) return 'Rp ' + (n/1e9).toFixed(1) + 'M';
+  if (n >= 1e6) return 'Rp ' + (n/1e6).toFixed(1) + 'jt';
+  if (n >= 1e3) return 'Rp ' + (n/1e3).toFixed(0) + 'rb';
+  return 'Rp ' + n;
+};
+const today = () => new Date().toISOString().slice(0,10);
+const thisMonth = () => new Date().toISOString().slice(0,7);
+
+function setEl(id, val) { const el = document.getElementById(id); if(el) el.textContent = val; }
+function showToast(msg='✅ Tersimpan!') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// INIT
+document.getElementById('m-fb-date').value = today();
+document.getElementById('m-sv-date').value = today();
+const tm = document.getElementById('target-month-input');
+if(tm) tm.value = thisMonth();
+renderAll();
+
+// NAV
+function navTo(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  btn.classList.add('active');
+  if(page === 'analytics') renderAnalytics();
+  if(page === 'target') renderTargetPage();
+  if(page === 'home') renderAll();
+}
+
+// MODAL
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openAddModal() { openModal('modal-add'); }
+function openFbModal() { openModal('modal-fb-api'); }
+function openSvModal() { openModal('modal-sv-api'); }
+function openTargetModal() { openModal('modal-target'); }
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if(e.target === el) el.classList.remove('open'); });
+});
+
+// MODAL TABS
+function switchModalTab(tab, btn) {
+  document.querySelectorAll('.modal-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('modal-fb').style.display = tab === 'fb' ? '' : 'none';
+  document.getElementById('modal-scalev').style.display = tab === 'scalev' ? '' : 'none';
+}
+
+function switchAnalyticsTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('analytics-fb').style.display = tab === 'fb' ? '' : 'none';
+  document.getElementById('analytics-scalev').style.display = tab === 'scalev' ? '' : 'none';
+}
+
+// TAX PREVIEW
+function previewTax() {
+  const spend = parseFloat(document.getElementById('m-fb-spend').value) || 0;
+  const tax = spend * TAX;
+  const total = spend + tax;
+  document.getElementById('tax-preview').textContent = fmt(tax);
+  document.getElementById('total-preview').textContent = fmt(total);
+}
+
+// SAVE DATA
+function saveFbData() {
+  const date = document.getElementById('m-fb-date').value;
+  const campaign = document.getElementById('m-fb-campaign').value || 'Campaign';
+  const spend = parseFloat(document.getElementById('m-fb-spend').value) || 0;
+  const impressions = parseInt(document.getElementById('m-fb-impressions').value) || 0;
+  const clicks = parseInt(document.getElementById('m-fb-clicks').value) || 0;
+  const purchases = parseInt(document.getElementById('m-fb-purchases').value) || 0;
+  if (!date || spend <= 0) { alert('Isi tanggal dan pengeluaran!'); return; }
+  const tax = spend * TAX;
+  state.fbData.push({ date, campaign, spend, tax, total: spend + tax, impressions, clicks, purchases });
+  closeModal('modal-add');
+  document.getElementById('m-fb-spend').value = '';
+  document.getElementById('m-fb-campaign').value = '';
+  document.getElementById('m-fb-impressions').value = '';
+  document.getElementById('m-fb-clicks').value = '';
+  document.getElementById('m-fb-purchases').value = '';
+  document.getElementById('tax-preview').textContent = 'Rp 0';
+  document.getElementById('total-preview').textContent = 'Rp 0';
+  renderAll();
+  showToast('✅ Data iklan tersimpan!');
+}
+
+function saveSvData() {
+  const date = document.getElementById('m-sv-date').value;
+  const product = document.getElementById('m-sv-product').value || 'Produk';
+  const revenue = parseFloat(document.getElementById('m-sv-revenue').value) || 0;
+  const orders = parseInt(document.getElementById('m-sv-orders').value) || 0;
+  const cogs = parseFloat(document.getElementById('m-sv-cogs').value) || 0;
+  if (!date || revenue <= 0) { alert('Isi tanggal dan revenue!'); return; }
+  state.svData.push({ date, product, revenue, orders, cogs });
+  closeModal('modal-add');
+  document.getElementById('m-sv-revenue').value = '';
+  document.getElementById('m-sv-product').value = '';
+  document.getElementById('m-sv-orders').value = '';
+  document.getElementById('m-sv-cogs').value = '';
+  renderAll();
+  showToast('✅ Data penjualan tersimpan!');
+}
+
+// CALC
+function calcMonth() {
+  const m = thisMonth();
+  const fb = state.fbData.filter(d => d.date.startsWith(m));
+  const sv = state.svData.filter(d => d.date.startsWith(m));
+  const totalSpend = fb.reduce((a, d) => a + d.spend, 0);
+  const totalTax = fb.reduce((a, d) => a + d.tax, 0);
+  const totalTotal = fb.reduce((a, d) => a + d.total, 0);
+  const totalRev = sv.reduce((a, d) => a + d.revenue, 0);
+  const totalCogs = sv.reduce((a, d) => a + d.cogs, 0);
+  const totalOrders = sv.reduce((a, d) => a + d.orders, 0);
+  const totalPurchases = fb.reduce((a, d) => a + d.purchases, 0);
+  const totalImpr = fb.reduce((a, d) => a + d.impressions, 0);
+  const totalClicks = fb.reduce((a, d) => a + d.clicks, 0);
+  const profit = totalRev - totalTotal - totalCogs;
+  const roas = totalTotal > 0 ? totalRev / totalTotal : null;
+  const cpa = totalPurchases > 0 ? totalTotal / totalPurchases : null;
+  const ctr = totalImpr > 0 ? (totalClicks / totalImpr * 100) : null;
+  return { totalSpend, totalTax, totalTotal, totalRev, totalCogs, totalOrders, totalPurchases, profit, roas, cpa, ctr };
+}
+
+// RENDER ALL
+function renderAll() {
+  const c = calcMonth();
+  setEl('display-name', state.name);
+  setEl('home-profit', Math.round(c.profit).toLocaleString('id-ID'));
+  setEl('home-rev', fmtShort(c.totalRev));
+  setEl('home-spend', fmtShort(c.totalTotal));
+  setEl('pill-roas', c.roas ? c.roas.toFixed(2) + 'x' : '—');
+  setEl('pill-cpa', c.cpa ? fmtShort(c.cpa) : '—');
+  setEl('pill-orders', c.totalOrders);
+  setEl('pill-tax', fmtShort(c.totalTax));
+  renderTargetBar(c.profit);
+  renderBarChart();
+  renderTxnList();
+}
+
+function renderTargetBar(profit) {
+  const pct = state.target > 0 ? Math.min(100, Math.round(profit / state.target * 100)) : 0;
+  const remaining = Math.max(0, state.target - profit);
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const daysDone = now.getDate();
+  const daysLeft = daysInMonth - daysDone;
+  const avgPerDay = daysDone > 0 ? profit / daysDone : 0;
+  const projected = avgPerDay * daysInMonth;
+  const neededPerDay = daysLeft > 0 ? remaining / daysLeft : 0;
+
+  setEl('target-pct-display', pct + '%');
+  setEl('target-sub-text', fmt(profit) + ' dari ' + fmt(state.target));
+  setEl('target-remaining', fmt(remaining));
+  setEl('target-per-day', fmtShort(neededPerDay));
+  setEl('target-projected', fmtShort(projected));
+  ['progress-fill','progress-fill-2'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.width = pct + '%';
+  });
+}
+
+function renderBarChart() {
+  const last7 = [...Array(7)].map((_,i) => { const d = new Date(); d.setDate(d.getDate()-6+i); return d.toISOString().slice(0,10); });
+  const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const allRevs = last7.map(d => state.svData.filter(x => x.date === d).reduce((a,x) => a+x.revenue, 0));
+  const allSpends = last7.map(d => state.fbData.filter(x => x.date === d).reduce((a,x) => a+x.total, 0));
+  const maxVal = Math.max(...allRevs, ...allSpends, 1);
+
+  const container = document.getElementById('bar-chart');
+  container.innerHTML = last7.map((date, i) => {
+    const revH = Math.round((allRevs[i] / maxVal) * 80);
+    const spendH = Math.round((allSpends[i] / maxVal) * 80);
+    const isToday = date === today();
+    const dow = new Date(date).getDay();
+    return `<div class="bar-group">
+      <div class="bar-pair">
+        <div class="bar income${isToday?' today-marker':''}" style="height:${Math.max(revH,4)}px;width:10px" title="${fmt(allRevs[i])}"></div>
+        <div class="bar expense" style="height:${Math.max(spendH,4)}px;width:10px" title="${fmt(allSpends[i])}"></div>
+      </div>
+      <div class="bar-day">${days[dow]}</div>
+    </div>`;
+  }).join('');
+
+  const start = last7[0].slice(5).replace('-','/');
+  const end = last7[6].slice(5).replace('-','/');
+  setEl('chart-week-label', start + ' – ' + end);
+}
+
+function renderTxnList() {
+  const allTxns = [
+    ...state.fbData.map(d => ({ ...d, src: 'fb' })),
+    ...state.svData.map(d => ({ ...d, src: 'sv' }))
+  ].sort((a,b) => b.date.localeCompare(a.date)).slice(0,6);
+
+  const el = document.getElementById('home-txn-list');
+  if(allTxns.length === 0) { el.innerHTML = '<div class="empty-state">Belum ada transaksi. Tambahkan lewat tombol + di bawah.</div>'; return; }
+  el.innerHTML = allTxns.map(d => {
+    const isFb = d.src === 'fb';
+    const amount = isFb ? d.total : d.revenue;
+    const isToday = d.date === today();
+    return `<div class="txn-item">
+      <div class="txn-icon" style="background:${isFb?'rgba(59,130,246,0.15)':'rgba(16,185,129,0.15)'}">${isFb?'📘':'🛒'}</div>
+      <div class="txn-info">
+        <div class="txn-name">${isFb ? d.campaign : d.product}</div>
+        <div class="txn-cat">${isFb ? 'Facebook Ads' : 'Scalev'}</div>
+      </div>
+      <div class="txn-right">
+        <div class="txn-amount ${isFb?'neg':'pos'}">${isFb?'-':'+'}${fmtShort(amount)}</div>
+        <div class="txn-date">${isToday ? 'Hari ini' : d.date}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAnalytics() {
+  const c = calcMonth();
+  setEl('ana-fb-spend', fmt(c.totalSpend));
+  setEl('ana-fb-tax', fmt(c.totalTax));
+  setEl('ana-fb-total', fmt(c.totalTotal));
+  setEl('ana-roas', c.roas ? c.roas.toFixed(2) + 'x' : '—');
+  setEl('ana-ctr', c.ctr ? c.ctr.toFixed(2) + '%' : '—');
+  setEl('ana-cpa', c.cpa ? fmt(c.cpa) : '—');
+  setEl('dl-spend', fmt(c.totalSpend));
+  setEl('dl-tax', fmt(c.totalTax));
+  setEl('dl-total', fmt(c.totalTotal));
+  setEl('donut-pct', c.totalTotal > 0 ? Math.round(c.totalTax/c.totalTotal*100) + '%' : '0%');
+  // donut arcs
+  const total = c.totalTotal || 1;
+  const circ = 226.2;
+  const taxOffset = circ - (c.totalTax / total * circ);
+  const spendOffset = circ - (c.totalSpend / total * circ);
+  const donutSpend = document.getElementById('donut-spend');
+  const donutTax = document.getElementById('donut-tax');
+  if(donutSpend) donutSpend.style.strokeDashoffset = spendOffset;
+  if(donutTax) donutTax.style.strokeDashoffset = taxOffset;
+
+  setEl('ana-sv-rev', fmt(c.totalRev));
+  setEl('ana-sv-orders', c.totalOrders);
+  setEl('ana-sv-cogs', fmt(c.totalCogs));
+  setEl('ana-sv-aov', c.totalOrders > 0 ? fmt(c.totalRev / c.totalOrders) : '—');
+
+  // FB txn list
+  const fbEl = document.getElementById('fb-txn-list');
+  if(state.fbData.length === 0) { fbEl.innerHTML = '<div class="empty-state">Belum ada data iklan</div>'; }
+  else fbEl.innerHTML = state.fbData.slice().reverse().map(d => `
+    <div class="txn-item">
+      <div class="txn-icon" style="background:rgba(59,130,246,0.15)">📘</div>
+      <div class="txn-info">
+        <div class="txn-name">${d.campaign}</div>
+        <div class="txn-cat">${d.date} · CTR: ${d.impressions>0?(d.clicks/d.impressions*100).toFixed(2)+'%':'—'}</div>
+      </div>
+      <div class="txn-right">
+        <div class="txn-amount neg">${fmtShort(d.total)}</div>
+        <div class="txn-date"><span class="chip chip-amber">+${fmt(d.tax)} pajak</span></div>
+      </div>
+    </div>`).join('');
+
+  const svEl = document.getElementById('sv-txn-list');
+  if(state.svData.length === 0) { svEl.innerHTML = '<div class="empty-state">Belum ada data penjualan</div>'; }
+  else svEl.innerHTML = state.svData.slice().reverse().map(d => `
+    <div class="txn-item">
+      <div class="txn-icon" style="background:rgba(16,185,129,0.15)">🛒</div>
+      <div class="txn-info">
+        <div class="txn-name">${d.product}</div>
+        <div class="txn-cat">${d.date} · ${d.orders} order</div>
+      </div>
+      <div class="txn-right">
+        <div class="txn-amount pos">+${fmtShort(d.revenue)}</div>
+        <div class="txn-date">HPP: ${fmtShort(d.cogs)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderTargetPage() {
+  const c = calcMonth();
+  const profit = c.profit;
+  const pct = state.target > 0 ? Math.min(100, Math.round(profit / state.target * 100)) : 0;
+  const remaining = Math.max(0, state.target - profit);
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const daysDone = now.getDate();
+  const daysLeft = daysInMonth - daysDone;
+  const avgPerDay = daysDone > 0 ? profit / daysDone : 0;
+  const projected = avgPerDay * daysInMonth;
+  const neededPerDay = daysLeft > 0 ? remaining / daysLeft : 0;
+
+  setEl('target-page-pct', pct + '%');
+  setEl('tp-profit', fmt(profit));
+  setEl('tp-target', fmt(state.target));
+  setEl('tp-remaining', fmt(remaining));
+  setEl('tp-per-day', fmt(neededPerDay));
+  setEl('tp-avg', fmt(avgPerDay));
+  setEl('tp-projected', fmt(projected));
+  ['progress-fill','progress-fill-2'].forEach(id => { const el = document.getElementById(id); if(el) el.style.width = pct + '%'; });
+
+  const statusEl = document.getElementById('tp-status');
+  if(profit >= state.target) statusEl.innerHTML = '<span class="chip chip-green">✅ Target Tercapai!</span>';
+  else if(projected >= state.target) statusEl.innerHTML = '<span class="chip chip-green">🔥 On Track</span>';
+  else statusEl.innerHTML = '<span class="chip chip-amber">⚡ Perlu Akselerasi</span>';
+}
+
+// TARGET
+function saveTarget() {
+  const v = parseFloat(document.getElementById('target-input').value);
+  if(v > 0) { state.target = v; renderAll(); renderTargetPage(); showToast('🎯 Target tersimpan!'); }
+}
+function saveTargetModal() {
+  const v = parseFloat(document.getElementById('modal-target-input').value);
+  if(v > 0) { state.target = v; closeModal('modal-target'); renderAll(); showToast('🎯 Target tersimpan!'); }
+}
+
+// API CONNECT
+function connectFbApi() {
+  const token = document.getElementById('s-fb-token').value;
+  const account = document.getElementById('s-fb-account').value;
+  if(!token || !account) { alert('Isi Access Token dan Ad Account ID!'); return; }
+  state.fbConnected = true;
+  setEl('fb-api-status-text', '✅ Terhubung');
+  document.getElementById('fb-api-status-text').className = 'api-status connected';
+  closeModal('modal-fb-api');
+  showToast('✅ Facebook Ads terhubung!');
+}
+function connectSvApi() {
+  const key = document.getElementById('s-sv-key').value;
+  const store = document.getElementById('s-sv-store').value;
+  if(!key) { alert('Isi API Key Scalev!'); return; }
+  state.svConnected = true;
+  setEl('sv-api-status-text', '✅ Terhubung');
+  document.getElementById('sv-api-status-text').className = 'api-status connected';
+  closeModal('modal-sv-api');
+  showToast('✅ Scalev terhubung!');
+}
+
+// NAME
+function saveName() {
+  const n = document.getElementById('settings-name').value;
+  if(n) { state.name = n; setEl('display-name', n); showToast('👤 Nama tersimpan!'); }
+}
+
+// RESET
+function resetData() {
+  if(confirm('Hapus semua data? Tidak bisa dibatalkan.')) {
+    state.fbData = []; state.svData = [];
+    renderAll();
+    showToast('🗑️ Data dihapus');
+  }
+}
+</script>
+</body>
+</html>
